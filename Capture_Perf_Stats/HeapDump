@@ -1,0 +1,72 @@
+usage() {
+        echo "usage: $0 [options]" >&2
+        cat >&2 <<"EOF"
+Options:
+  -h, --help            show this help message and exit
+  -t TIMEINTERVAL       time interval between each dumps
+  -i INSTANCE         websphere instance name
+  -v, --verbose         Enable verbose output
+
+EOF
+        exit
+}
+optspec=":hv:t:i:-:"
+while getopts "$optspec" optchar; do
+    case "${optchar}" in
+        -)
+            case "${OPTARG}" in
+                timeinterval=*)
+                    sleep_time=${OPTARG#*=}
+                    ;;
+
+                instance=*)
+                    instance_name=${OPTARG#*=}
+                    ;;
+                verbose)
+                    VERBOSE=true
+                    ;;
+                        *)
+                    if [ "$OPTERR" = 1 ] && [ "${optspec:0:1}" != ":" ]; then
+                        echo "Unknown option --${OPTARG}" >&2
+                        usage
+                    fi
+                    ;;
+            esac
+            ;;
+        t)
+            sleep_time=${OPTARG}
+            ;;
+        i)
+            instance_name=${OPTARG}
+            ;;
+
+        h)
+            usage
+            exit 2
+            ;;
+        *)
+            if [ "$OPTERR" != 1 ] || [ "${optspec:0:1}" = ":" ]; then
+                echo "Non-option argument: '-${OPTARG}'" >&2
+                usage
+            fi
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -z "$sleep_time" ]
+then
+        echo need to set sleep_time
+        usage
+fi
+if [ -z "$instance_name" ]
+
+then
+        echo need to provide instance name for which dumps need to be collected
+        usage
+fi
+
+echo "$instance_name"
+java_pid=``ps -lef|grep $instance_name|awk '{print $2}'
+echo "$sleep_time"
+kill -3 $process_id 
